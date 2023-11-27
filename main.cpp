@@ -84,8 +84,7 @@ void replace_default_logger_example() {
     spdlog::info("new logger log message");
 }
 
-
-int main(int argc, char *argv[]) {
+void registry_base() {
 
     spdlog::info("Welcome to spdlog!");
     spdlog::error("Some error message with arg: {}", 1);
@@ -109,7 +108,10 @@ int main(int argc, char *argv[]) {
     spdlog::cfg::load_env_levels();
     // or from the command line
     // ./example SPDLOG_LEVEL=info, mylogger=trace
-    // #include "spdlog/cfg/argv.h" // for loading levels from argv
-    // spdlog::cfg::load_argv_levels(argc, argv);
+}
+
+
+int main(int argc, char *argv[]) {
+    stdout_example();
 
 }
