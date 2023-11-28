@@ -5,9 +5,9 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+# set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(main LANGUAGES CXX)
 
@@ -19,6 +19,7 @@ find_package(magic_enum REQUIRED)
 
 # add_compile_definitions(SPDLOG_USE_STD_FORMAT)
 add_executable(main main.cpp)
+target_include_directories(main PRIVATE include)
 target_link_libraries(main PRIVATE magic_enum::magic_enum)
 # target_link_libraries(main PRIVATE spdlog::spdlog)
 target_link_libraries(main PRIVATE spdlog::spdlog)
