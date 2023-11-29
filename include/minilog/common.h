@@ -1,9 +1,14 @@
 #pragma once
 
+#include <memory>
 #include <atomic>
 namespace minilog {
-using level_t = std::atomic<int>;
 
+namespace sinks {
+class sink;
+}
+using level_t = std::atomic<int>;
+using sink_ptr = std::shared_ptr<sinks::sink>;
 namespace level {
 enum level_enum : int {
     trace,

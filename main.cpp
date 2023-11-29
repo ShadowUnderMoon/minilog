@@ -24,6 +24,7 @@ void basic_logfile_example() {
     try
     {
         auto logger = spdlog::basic_logger_mt("basic_logger", "logs/basic-log.txt");
+        logger->error("this is an error message");
     }
     catch (const spdlog::spdlog_ex& ex) {
         std::cout << "Log init failed: " << ex.what() << std::endl;
@@ -112,6 +113,7 @@ void registry_base() {
 
 
 int main(int argc, char *argv[]) {
-    stdout_example();
+    // stdout_example();
+    basic_logfile_example();
 
 }

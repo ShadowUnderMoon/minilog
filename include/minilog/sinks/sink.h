@@ -1,7 +1,7 @@
 #pragma once
 
-#include <common.h>
-#include <log_msg.h>
+#include <minilog/common.h>
+#include <minilog/log_msg.h>
 namespace minilog::sinks {
 
 class sink {
