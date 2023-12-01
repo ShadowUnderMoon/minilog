@@ -4,6 +4,9 @@
 #include <spdlog/sinks/callback_sink.h>
 #include <spdlog/async.h>
 #include <spdlog/cfg/env.h>
+
+#include <minilog/sinks/basic_file_sink.h>
+
 #include <iostream>
 
 // multi/single threaded loggers
@@ -29,6 +32,11 @@ void basic_logfile_example() {
     catch (const spdlog::spdlog_ex& ex) {
         std::cout << "Log init failed: " << ex.what() << std::endl;
     }
+}
+
+void minilog_basic_logfile() {
+    auto logger = minilog::basic_logger_mt("basic_logger", "logs/basic-log.txt");
+    logger->error("this is an error message");
 }
 
 // create a logger with 2 targets, with different log levels and formats

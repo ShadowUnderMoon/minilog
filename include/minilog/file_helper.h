@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <minilog/common.h>
 
 namespace minilog {
@@ -49,7 +51,7 @@ public:
 private:
     const int open_tries_ = 5;
     const unsigned int open_interval_ = 10;
-    std::FILE *fd_{nullptr};
+    FILE *fd_{nullptr};
     std::string filename_;
 };
 }

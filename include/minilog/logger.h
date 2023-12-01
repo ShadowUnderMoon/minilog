@@ -57,6 +57,33 @@ public:
     }
     virtual ~logger() = default;
 
+    template <typename T>
+    void trace(const T &msg) {
+
+    }
+
+    template <typename T>
+    void debug(const T &msg) {
+
+    }
+
+    template <typename T>
+    void info(const T &msg) {
+
+    }
+    template <typename T>
+    void warn(const T &msg) {
+
+    }
+    template <typename T>
+    void error(const T &msg) {
+
+    }
+    template <typename T>
+    void critical(const T &msg) {
+
+    }
+
 protected:
     std::string name_;
     std::vector<sink_ptr> sinks_;
