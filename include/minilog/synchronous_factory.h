@@ -3,9 +3,8 @@
 #include <memory>
 #include <string>
 
+#include <minilog/logger.h>
 namespace minilog {
-
-class logger;
 
 struct synchronous_factory {
     template <typename Sink, typename... SinkArgs>

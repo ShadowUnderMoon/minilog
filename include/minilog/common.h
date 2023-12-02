@@ -4,6 +4,9 @@
 #include <atomic>
 namespace minilog {
 
+template <typename T>
+concept convertible_to_string_view = std::convertible_to<T, std::string_view>;
+
 namespace sinks {
 class sink;
 }

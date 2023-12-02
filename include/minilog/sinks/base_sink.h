@@ -1,4 +1,7 @@
 #pragma once
+
+#include <format>
+#include <magic_enum.hpp>
 #include <minilog/common.h>
 #include <minilog/sinks/sink.h>
 #include <minilog/log_msg.h>
@@ -26,6 +29,9 @@ public:
         flush_();
     }
 
+    static std::string format(const log_msg &msg) {
+        return std::format("[{}] [{}] {}\n", msg.logger_name, magic_enum::enum_name(msg.level), msg.payload);
+    } 
 protected:
     Mutex mutex_;
 

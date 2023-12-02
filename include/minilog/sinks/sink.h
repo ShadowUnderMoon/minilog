@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <minilog/common.h>
 #include <minilog/log_msg.h>
 namespace minilog::sinks {
@@ -10,12 +12,19 @@ public:
     virtual void log(const log_msg &msg) = 0;
     virtual void flush() = 0;
     
-    void set_level(level::level_enum log_level);
-    level::level_enum level() const;
-    bool should_log(level::level_enum msg_level) const;
+    void set_level(level::level_enum log_level) {
+
+    }
+    level::level_enum level() const {
+        return level_;
+    }
+    bool should_log(level::level_enum msg_level) const {
+        return true;
+    }
 
 protected:
-    level_t level_{level::trace};
+    level::level_enum level_{level::trace};
+    std::mutex mtx;
 };
 
 }

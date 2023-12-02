@@ -35,8 +35,9 @@ void basic_logfile_example() {
 }
 
 void minilog_basic_logfile() {
-    auto logger = minilog::basic_logger_mt("basic_logger", "logs/basic-log.txt");
+    auto logger = minilog::basic_logger_mt("basic_logger", "basic-log.txt");
     logger->error("this is an error message");
+    logger->info(30);
 }
 
 // create a logger with 2 targets, with different log levels and formats
@@ -122,6 +123,6 @@ void registry_base() {
 
 int main(int argc, char *argv[]) {
     // stdout_example();
-    basic_logfile_example();
-
+    // basic_logfile_example();
+    minilog_basic_logfile();
 }

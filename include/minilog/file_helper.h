@@ -1,57 +1,26 @@
 #pragma once
 
-#include <string>
-
-#include <minilog/common.h>
+#include <fstream>
 
 namespace minilog {
+
 class file_helper {
 public:
     file_helper() = default;
-
+    file_helper(const std::string &filename) : file_(filename, std::ios::out), filename_(filename) {}
     file_helper(const file_helper &) = delete;
     file_helper &operator=(const file_helper &) = delete;
 
-    void open(const std::string &fname, bool truncate = false) {
-
-    }
-
-    void reopen(bool truncate) {
-
-    }
-
-    void flush() {
-
-    }
-
-    void sync() {
-
-    }
-
-    void close() {
-
-    }
-
-    void write(const std::string &buf) {
-
-    }
-
-    size_t size() const {
-
-    }
-
     const std::string &filename() const {
-
+        return filename_;
     }
 
-    static std::tuple<std::string, std::string> split_by_extension(const std::string &fname) {
-
+    void write(const std::string &msg) {
+        file_ << msg;
     }
-
 private:
-    const int open_tries_ = 5;
-    const unsigned int open_interval_ = 10;
-    FILE *fd_{nullptr};
+    std::ofstream file_;
     std::string filename_;
 };
+
 }
