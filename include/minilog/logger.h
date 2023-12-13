@@ -137,27 +137,27 @@ public:
 
     template <typename... Args>
     void debug(std::string_view fmt, Args &&...args) {
-        log(level::trace, fmt, std::forward<Args>(args)...);
+        log(level::debug, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
     void info(std::string_view fmt, Args &&...args) {
-        log(level::trace, fmt, std::forward<Args>(args)...);
+        log(level::info, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
     void warn(std::string_view fmt, Args &&...args) {
-        log(level::trace, fmt, std::forward<Args>(args)...);
+        log(level::warn, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
     void error(std::string_view fmt, Args &&...args) {
-        log(level::trace, fmt, std::forward<Args>(args)...);
+        log(level::err, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
     void critical(std::string_view fmt, Args &&...args) {
-        log(level::trace, fmt, std::forward<Args>(args)...);
+        log(level::critical, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>

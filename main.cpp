@@ -38,6 +38,10 @@ void minilog_basic_logfile() {
     auto logger = minilog::basic_logger_mt("basic_logger", "basic-log.txt");
     logger->error("this is an error message");
     logger->info(30);
+    logger->set_level(minilog::level::debug);
+    logger->info("{}: {}", "hello", 30);
+    logger->debug("hello");
+    logger->trace("shold not be printed");
 }
 
 // create a logger with 2 targets, with different log levels and formats
