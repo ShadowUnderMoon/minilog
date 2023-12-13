@@ -30,14 +30,14 @@ public:
     logger(const logger& other)
         : name_(other.name_),
           sinks_(other.sinks_),
-          level_(other.level_),
-          flush_level_(other.flush_level_) {}
+          level_(other.level_.load(std::memory_order_relaxed)),
+          flush_level_(other.flush_level_.load(std::memory_order_relaxed)) {}
 
     logger(logger&& other) noexcept
         : name_(std::move(other.name_)),
           sinks_(std::move(other.sinks_)),
-          level_(other.level_),
-          flush_level_(other.flush_level_) {}
+          level_(other.level_.load(std::memory_order_relaxed)),
+          flush_level_(other.flush_level_.load(std::memory_order_relaxed)) {}
     
     logger& operator=(logger other) noexcept {
         this->swap(other);
@@ -49,18 +49,39 @@ public:
         sinks_.swap(other.sinks_);
 
         // swap level_
-        std::swap(level_, other.level_);
+        auto other_level = other.level_.load();
+        auto my_level = level_.exchange(other_level);
+        other.level_.store(my_level);
+
 
         // swap flush level_
-        std::swap(flush_level_, other.flush_level_);
+        other_level = other.flush_level_.load();
+        my_level = flush_level_.exchange(other_level);
+        other.flush_level_.store(my_level);
     }
     virtual ~logger() = default;
 
-    bool should_log(level::level_enum msg_level) const {
-        std::unique_lock<std::mutex> lock(mtx);
-        bool result = msg_level >= level_;
-        return result;
+    void set_level(level::level_enum log_level) {
+        level_.store(log_level);
     }
+
+    level::level_enum level() const {
+        return static_cast<level::level_enum>(level_.load(std::memory_order_relaxed));
+    }
+
+    level::level_enum flush_level() const {
+        return static_cast<level::level_enum>(flush_level_.load(std::memory_order_relaxed));
+    }
+
+    bool should_flush(const log_msg &msg) {
+        auto flush_level = flush_level_.load(std::memory_order_relaxed);
+        return (msg.level >= flush_level) && (msg.level != level::off);
+    }
+
+    bool should_log(level::level_enum msg_level) const {
+        return msg_level >= level_.load(std::memory_order_relaxed);
+    }
+
     template <typename... Args>
     void log(level::level_enum lvl, std::string_view fmt, Args &&...args) {
         log_(lvl, fmt, std::forward<Args>(args)...);
@@ -110,8 +131,38 @@ public:
     }
 
     template <typename... Args>
+    void trace(std::string_view fmt, Args &&...args) {
+        log(level::trace, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    void debug(std::string_view fmt, Args &&...args) {
+        log(level::trace, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    void info(std::string_view fmt, Args &&...args) {
+        log(level::trace, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    void warn(std::string_view fmt, Args &&...args) {
+        log(level::trace, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    void error(std::string_view fmt, Args &&...args) {
+        log(level::trace, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    void critical(std::string_view fmt, Args &&...args) {
+        log(level::trace, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
     void log_(level::level_enum lvl, std::string_view fmt, Args &&...args) {
-        bool log_enabled = true;
+        bool log_enabled = should_log(lvl);
         std::string message = vformat(fmt, std::make_format_args(args...));
         log_msg log_message(name_, lvl, message);
         log_it_(log_message, log_enabled);
@@ -134,9 +185,8 @@ public:
 protected:
     std::string name_;
     std::vector<sink_ptr> sinks_;
-    level::level_enum level_{level::info};
-    level::level_enum flush_level_{level::off};
-    mutable std::mutex mtx;
+    std::atomic<int> level_{level::info};
+    std::atomic<int> flush_level_{level::off};
 };
 
 inline void swap(logger& a, logger& b) {

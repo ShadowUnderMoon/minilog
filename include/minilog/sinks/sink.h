@@ -13,17 +13,19 @@ public:
     virtual void flush() = 0;
     
     void set_level(level::level_enum log_level) {
+        level_.store(log_level);
+    }
 
-    }
     level::level_enum level() const {
-        return level_;
+        return static_cast<level::level_enum>(level_.load(std::memory_order_relaxed));
     }
+
     bool should_log(level::level_enum msg_level) const {
-        return true;
+        return msg_level >= level_.load(std::memory_order_relaxed);
     }
 
 protected:
-    level::level_enum level_{level::trace};
+    std::atomic<int> level_{level::trace};
     std::mutex mtx;
 };
 
