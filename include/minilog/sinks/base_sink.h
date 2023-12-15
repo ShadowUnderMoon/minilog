@@ -1,6 +1,8 @@
 #pragma once
 
 #include <format>
+#include <filesystem>
+
 #include <magic_enum.hpp>
 #include <minilog/common.h>
 #include <minilog/sinks/sink.h>
@@ -30,7 +32,8 @@ public:
     }
 
     static std::string format(const log_msg &msg) {
-        return std::format("[{}] [{}] {}\n", msg.logger_name, magic_enum::enum_name(msg.level), msg.payload);
+        std::filesystem::path absolute_path = msg.location.file_name();
+        return std::format("{}:{} [{}] [{}] [{}] {}\n", std::string(absolute_path.filename()), msg.location.line(), msg.time, msg.logger_name, magic_enum::enum_name(msg.level), msg.payload);
     } 
 protected:
     Mutex mutex_;

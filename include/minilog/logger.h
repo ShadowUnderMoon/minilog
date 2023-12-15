@@ -3,12 +3,24 @@
 #include <format>
 #include <string>
 #include <vector>
+#include <concepts>
 
 #include <minilog/common.h>
 #include <minilog/log_msg.h>
 #include <minilog/sinks/sink.h>
 
 namespace minilog {
+
+
+struct FormatWithLocation {
+    std::string_view format;
+    std::source_location location;
+
+    template <typename T>
+        requires std::convertible_to<T, std::string_view>
+    FormatWithLocation(const T &fmt, std::source_location loc=std::source_location::current()):
+        format(fmt), location(std::move(loc)) {}
+};
 
 class logger {
 public:
@@ -83,89 +95,84 @@ public:
     }
 
     template <typename... Args>
-    void log(level::level_enum lvl, std::string_view fmt, Args &&...args) {
-        log_(lvl, fmt, std::forward<Args>(args)...);
+    void log(level::level_enum lvl, FormatWithLocation format_with_location, Args &&...args) {
+        bool log_enabled = should_log(lvl);
+        std::string message = vformat(format_with_location.format, std::make_format_args(args...));
+        log_msg log_message(name_, lvl, message, format_with_location.location);
+        log_it_(log_message, log_enabled);
     }
 
     template <typename T>
         requires (!convertible_to_string_view<T>)
-    void log(level::level_enum lvl, const T &msg) {
-        log(lvl, "{}", msg);
+    void log(level::level_enum lvl, const T &msg, std::source_location loc=std::source_location::current()) {
+        log(lvl, FormatWithLocation("{}", loc), msg);
     }
 
-    void log(level::level_enum lvl, std::string_view msg) {
+    void log(level::level_enum lvl, std::string_view msg, std::source_location loc=std::source_location::current()) {
         bool log_enabled = should_log(lvl);
         if (!log_enabled) return;
-        log_msg log_message(name_, lvl, msg);
+        log_msg log_message(name_, lvl, msg, loc);
         log_it_(log_message, log_enabled);
     }
 
     template <typename T>
-    void trace(const T &msg) {
-        log(level::trace, msg);
+    void trace(const T &msg, std::source_location loc=std::source_location::current()) {
+        log(level::trace, msg, loc);
     }
 
     template <typename T>
-    void debug(const T &msg) {
-        log(level::debug, msg);
+    void debug(const T &msg, std::source_location loc=std::source_location::current()) {
+        log(level::debug, msg, loc);
     }
 
     template <typename T>
-    void info(const T &msg) {
-        log(level::info, msg);
+    void info(const T &msg, std::source_location loc=std::source_location::current()) {
+        log(level::info, msg, loc);
     }
 
     template <typename T>
-    void warn(const T &msg) {
-        log(level::warn, msg);
+    void warn(const T &msg, std::source_location loc=std::source_location::current()) {
+        log(level::warn, msg, loc);
     }
 
     template <typename T>
-    void error(const T &msg) {
-        log(level::err, msg);
+    void error(const T &msg, std::source_location loc=std::source_location::current()) {
+        log(level::err, msg, loc);
     }
 
     template <typename T>
-    void critical(const T &msg) {
-        log(level::critical, msg);
+    void critical(const T &msg, std::source_location loc=std::source_location::current()) {
+        log(level::critical, msg, loc);
     }
 
     template <typename... Args>
-    void trace(std::string_view fmt, Args &&...args) {
+    void trace(FormatWithLocation fmt, Args &&...args) {
         log(level::trace, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
-    void debug(std::string_view fmt, Args &&...args) {
+    void debug(FormatWithLocation fmt, Args &&...args) {
         log(level::debug, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
-    void info(std::string_view fmt, Args &&...args) {
+    void info(FormatWithLocation fmt, Args &&...args) {
         log(level::info, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
-    void warn(std::string_view fmt, Args &&...args) {
+    void warn(FormatWithLocation fmt, Args &&...args) {
         log(level::warn, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
-    void error(std::string_view fmt, Args &&...args) {
+    void error(FormatWithLocation fmt, Args &&...args) {
         log(level::err, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
-    void critical(std::string_view fmt, Args &&...args) {
+    void critical(FormatWithLocation fmt, Args &&...args) {
         log(level::critical, fmt, std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    void log_(level::level_enum lvl, std::string_view fmt, Args &&...args) {
-        bool log_enabled = should_log(lvl);
-        std::string message = vformat(fmt, std::make_format_args(args...));
-        log_msg log_message(name_, lvl, message);
-        log_it_(log_message, log_enabled);
     }
 
     void log_it_(const log_msg &log_message, bool log_enabled)

@@ -26,7 +26,7 @@ void stdout_example() {
 void basic_logfile_example() {
     try
     {
-        auto logger = spdlog::basic_logger_mt("basic_logger", "logs/basic-log.txt");
+        auto logger = spdlog::basic_logger_mt("basic_logger", "spdlog.txt");
         logger->error("this is an error message");
     }
     catch (const spdlog::spdlog_ex& ex) {
@@ -127,6 +127,6 @@ void registry_base() {
 
 int main(int argc, char *argv[]) {
     // stdout_example();
-    // basic_logfile_example();
+    basic_logfile_example();
     minilog_basic_logfile();
 }
