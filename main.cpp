@@ -5,6 +5,7 @@
 #include <spdlog/async.h>
 #include <spdlog/cfg/env.h>
 
+#include <minilog/minilog.h>
 #include <minilog/sinks/basic_file_sink.h>
 #include <minilog/sinks/console_sink.h>
 #include <iostream>
@@ -32,6 +33,10 @@ void minilog_stdout_example() {
     console->debug("this is a debug message to terminal");
     console->error("this is an error message to terminal");
     console->info("this is an info message to terminal");
+    auto logger_from_registry = minilog::get("minilog_console");
+    if (logger_from_registry) {
+        logger_from_registry->info("a message from retrieved logger from registry");
+    }
     auto err_logger = minilog::stderr_color_mt("minilog_stderr");
     err_logger->info("hello from stderr");
     auto console_nocolor = minilog::stdout_color_mt("minilog_console_nocolor", minilog::color_mode::never);

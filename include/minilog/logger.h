@@ -55,6 +55,10 @@ public:
         this->swap(other);
         return *this;
     }
+
+    const std::string &name() const {
+        return name_;
+    }
     
     void swap(logger& other) noexcept {
         name_.swap(other.name_);
