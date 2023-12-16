@@ -132,12 +132,12 @@ public:
 
     template <typename T>
     void warn(const T &msg, std::source_location loc=std::source_location::current()) {
-        log(level::warn, msg, loc);
+        log(level::warning, msg, loc);
     }
 
     template <typename T>
     void error(const T &msg, std::source_location loc=std::source_location::current()) {
-        log(level::err, msg, loc);
+        log(level::error, msg, loc);
     }
 
     template <typename T>
@@ -162,12 +162,12 @@ public:
 
     template <typename... Args>
     void warn(FormatWithLocation fmt, Args &&...args) {
-        log(level::warn, fmt, std::forward<Args>(args)...);
+        log(level::warning, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>
     void error(FormatWithLocation fmt, Args &&...args) {
-        log(level::err, fmt, std::forward<Args>(args)...);
+        log(level::error, fmt, std::forward<Args>(args)...);
     }
 
     template <typename... Args>

@@ -31,7 +31,7 @@ public:
         flush_();
     }
 
-    static std::string format(const log_msg &msg) {
+    std::string format(const log_msg &msg) {
         std::filesystem::path absolute_path = msg.location.file_name();
         return std::format("{}:{} [{}] [{}] [{}] {}\n", std::string(absolute_path.filename()), msg.location.line(), msg.time, msg.logger_name, magic_enum::enum_name(msg.level), msg.payload);
     } 

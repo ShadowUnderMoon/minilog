@@ -26,7 +26,6 @@ public:
 
 protected:
     std::atomic<int> level_{level::trace};
-    std::mutex mtx;
 };
 
 }

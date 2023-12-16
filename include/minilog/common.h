@@ -17,11 +17,13 @@ enum level_enum : int {
     trace,
     debug,
     info,
-    warn,
-    err,
+    warning,
+    error,
     critical,
     off,
     n_levels
 };
 } // end namespace level
+
+enum class color_mode { always, automatic, never };
 }
