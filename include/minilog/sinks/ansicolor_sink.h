@@ -1,5 +1,5 @@
+#pragma once
 
-#include "minilog/synchronous_factory.h"
 #include <array>
 #include <cstdio>
 #include <cstdlib>
@@ -13,7 +13,6 @@
 #include <minilog/sinks/sink.h>
 #include <minilog/common.h>
 #include <minilog/null_mutex.h>
-
 namespace minilog::sinks {
 
 inline bool in_terminal(FILE *file) {
@@ -22,8 +21,7 @@ inline bool in_terminal(FILE *file) {
 
 inline bool is_color_terminal() {
     static const bool result = []() {
-        std::string env_colorterm = std::getenv("COLORTERM");
-        if (env_colorterm.empty()) {
+        if (const char *env_colorterm = std::getenv("COLORTERM")) {
             return true;
         }
 
@@ -31,13 +29,13 @@ inline bool is_color_terminal() {
             {"ansi", "color", "console", "cygwin", "gnome", "konsole", "kterm", "linux", "msys",
              "putty", "rxvt", "screen", "vt100", "xterm", "alacritty", "vt102"}};
 
-        std::string env_term = std::getenv("TERM");
-        if (env_term.empty()) {
+        const char *env_term = std::getenv("TERM");
+        if (!env_term) {
             return false;
         }
-
+        std::string env_term_str{env_term};
         return std::any_of(terms.begin(), terms.end(), [&](const std::string &term) {
-            return env_term.find(term) != std::string::npos;
+            return env_term_str.find(term) != std::string::npos;
         });
     }();
 
@@ -113,9 +111,11 @@ public:
 
     std::string format(const log_msg &msg) {
         std::filesystem::path absolute_path = msg.location.file_name();
-        std::string format_str = "{}:{} [{}] [{}] [{}] {}\n";
+        std::string format_str = "{}:{} [{}] [{}] [{}] {}";
         if (should_color()) {
-            format_str = colors_.at(msg.level) + format_str + std::string(reset);
+            format_str = colors_.at(msg.level) + format_str + std::string(reset) + "\n";
+        } else {
+            format_str = format_str + "\n";
         }
         return std::vformat(format_str, std::make_format_args(std::string(absolute_path.filename()), msg.location.line(), msg.time, msg.logger_name, magic_enum::enum_name(msg.level), msg.payload));
     }
@@ -186,24 +186,3 @@ using stderr_color_sink_mt = ansicolor_stderr_sink_mt;
 using stderr_color_sink_st = ansicolor_stderr_sink_st;
 }
 
-namespace minilog {
-template <typename Factory = minilog::synchronous_factory>
-std::shared_ptr<logger> stdout_color_mt(const std::string& logger_name, color_mode mode = color_mode::automatic) {
-    return Factory::template create<sinks::stdout_color_sink_mt>(logger_name, mode);
-}
-
-template <typename Factory = minilog::synchronous_factory>
-std::shared_ptr<logger> stdout_color_st(const std::string& logger_name, color_mode mode = color_mode::automatic) {
-    return Factory::template create<sinks::stdout_color_sink_st>(logger_name, mode);
-}
-
-template <typename Factory = minilog::synchronous_factory>
-std::shared_ptr<logger> stderr_color_mt(const std::string& logger_name, color_mode mode = color_mode::automatic) {
-    return Factory::template create<sinks::stderr_color_sink_mt>(logger_name, mode);
-}
-
-template <typename Factory = minilog::synchronous_factory>
-std::shared_ptr<logger> stderr_color_st(const std::string& logger_name, color_mode mode = color_mode::automatic) {
-    return Factory::template create<sinks::stderr_color_sink_st>(logger_name, mode);
-}
-}

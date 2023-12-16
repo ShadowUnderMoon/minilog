@@ -7,7 +7,8 @@
 
 #include <minilog/minilog.h>
 #include <minilog/sinks/basic_file_sink.h>
-#include <minilog/sinks/console_sink.h>
+#include <minilog/sinks/stdout_color_sinks.h>
+#include <minilog/cfg.h>
 #include <iostream>
 
 // multi/single threaded loggers
@@ -132,22 +133,34 @@ void registry_base() {
     spdlog::set_level(spdlog::level::debug);
     spdlog::debug("This message should be displayed...");
 
-    spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
-
-    spdlog::debug("hello world");
-    SPDLOG_TRACE("Some trace message with param {}", 42);
-    SPDLOG_DEBUG("some debug message");
-
-
     spdlog::cfg::load_env_levels();
-    // or from the command line
-    // ./example SPDLOG_LEVEL=info, mylogger=trace
 }
 
+void minilog_registry_base() {
+
+    minilog::info("Welcome to spdlog!");
+    minilog::error("Some error message with arg: {}", 1);
+
+    minilog::warn("Easy padding in numbers like {:08d}", 12);
+    minilog::critical("Support for int: {0:d}; hex: {0:x}; oct: {0:o}; bin: {0: b}", 42);
+    minilog::info("Support for floats {:03.2f}", 1.23456);
+    minilog::info("Positional args are {1} {0}..", "two", "supported");
+    minilog::info("{:<30}", "left aligned");
+
+    minilog::set_level(minilog::level::debug);
+    minilog::debug("This message should be displayed...");
+
+    minilog::cfg::load_env_levels();
+    minilog::trace("the message should be printed when env var MINILOG_LEVEL = trace");
+}
 
 int main(int argc, char *argv[]) {
     stdout_example();
     minilog_stdout_example();
+
     basic_logfile_example();
     minilog_basic_logfile();
+
+    registry_base();
+    minilog_registry_base();
 }
