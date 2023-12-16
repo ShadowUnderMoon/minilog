@@ -6,7 +6,7 @@
 #include <spdlog/cfg/env.h>
 
 #include <minilog/sinks/basic_file_sink.h>
-
+#include <minilog/sinks/console_sink.h>
 #include <iostream>
 
 // multi/single threaded loggers
@@ -19,8 +19,23 @@
 void stdout_example() {
     // create a color multi-threaded logger
     auto console = spdlog::stdout_color_mt("console");
+    console->set_level(spdlog::level::debug);
+    console->debug("this is a debug message to terminal");
+    console->error("this is an error message to terminal");
     auto err_logger = spdlog::stderr_color_mt("stderr");
     spdlog::get("console")->info("loggers can be retrieved from a global registry using the spdlog::get(logger_name)");
+}
+
+void minilog_stdout_example() {
+    auto console = minilog::stdout_color_mt("minilog_console");
+    console->set_level(minilog::level::debug);
+    console->debug("this is a debug message to terminal");
+    console->error("this is an error message to terminal");
+    console->info("this is an info message to terminal");
+    auto err_logger = minilog::stderr_color_mt("minilog_stderr");
+    err_logger->info("hello from stderr");
+    auto console_nocolor = minilog::stdout_color_mt("minilog_console_nocolor", minilog::color_mode::never);
+    console_nocolor->error("an message without color");
 }
 
 void basic_logfile_example() {
@@ -126,7 +141,8 @@ void registry_base() {
 
 
 int main(int argc, char *argv[]) {
-    // stdout_example();
+    stdout_example();
+    minilog_stdout_example();
     basic_logfile_example();
     minilog_basic_logfile();
 }
