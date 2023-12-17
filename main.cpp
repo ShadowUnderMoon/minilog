@@ -8,6 +8,7 @@
 #include <minilog/minilog.h>
 #include <minilog/sinks/basic_file_sink.h>
 #include <minilog/sinks/stdout_color_sinks.h>
+#include <minilog/sinks/callback_sink.h>
 #include <minilog/cfg.h>
 #include <iostream>
 
@@ -106,11 +107,24 @@ void multi_sink_example2()
 void callback_example()
 {
     auto callback_sink = std::make_shared<spdlog::sinks::callback_sink_mt>([](const spdlog::details::log_msg& msg) {
-
+        std::cout << "email me error message: " << msg.payload << std::endl;
     });
     callback_sink->set_level(spdlog::level::err);
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     spdlog::logger logger("custom_callback_logger", {console_sink, callback_sink});
+
+    logger.info("some info log");
+    logger.error("critical issue");
+}
+
+void mninilog_callback_example()
+{
+    auto callback_sink = std::make_shared<minilog::sinks::callback_sink_mt>([](const minilog::log_msg& msg) {
+        std::cout << "email me error message: " << msg.payload << std::endl;
+    });
+    callback_sink->set_level(minilog::level::error);
+    auto console_sink = std::make_shared<minilog::sinks::stdout_color_sink_mt>();
+    minilog::logger logger("custom_callback_logger", {console_sink, callback_sink});
 
     logger.info("some info log");
     logger.error("critical issue");
@@ -188,6 +202,9 @@ int main(int argc, char *argv[]) {
     // replace_default_logger_example();
     // minilog_replace_default_logger();
 
-    multi_sink_example();
-    minilog_multi_sink();
+    // multi_sink_example();
+    // minilog_multi_sink();
+
+    callback_example();
+    mninilog_callback_example();
 }
