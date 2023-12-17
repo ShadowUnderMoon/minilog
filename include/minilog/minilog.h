@@ -14,7 +14,11 @@ inline std::shared_ptr<logger> get(const std::string &name)
 
 inline std::shared_ptr<logger> get_default_logger()
 {
-    return get("");
+    return registry::get_instance().get_default_logger();
+}
+
+inline void set_default_logger(std::shared_ptr<logger> default_logger) {
+    registry::get_instance().set_default_logger(std::move(default_logger));
 }
 
 inline void set_level(level::level_enum lvl) {

@@ -119,6 +119,16 @@ void replace_default_logger_example() {
     spdlog::info("new logger log message");
 }
 
+void minilog_replace_default_logger() {
+    minilog::info("default logger");
+    auto new_stdout_logger = minilog::stdout_color_mt("console");
+    minilog::set_default_logger(new_stdout_logger);
+    minilog::info("new stdout logger");
+    auto new_logger = minilog::basic_logger_mt("new_default_logger", "minilog_new-default-log.txt");
+    minilog::set_default_logger(new_logger);
+    minilog::info("new logger log message");
+}
+
 void registry_base() {
 
     spdlog::info("Welcome to spdlog!");
@@ -163,4 +173,7 @@ int main(int argc, char *argv[]) {
 
     registry_base();
     minilog_registry_base();
+
+    replace_default_logger_example();
+    minilog_replace_default_logger();
 }

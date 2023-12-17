@@ -37,14 +37,14 @@ using basic_file_sink_mt = basic_file_sink<std::mutex>;
 using basic_file_sink_st = basic_file_sink<null_mutex>;
 } // end of namespace sinks
 
-template <typename Factory = minilog::synchronous_factory>
+template <typename Factory = synchronous_factory>
 std::shared_ptr<logger> basic_logger_mt(const std::string &logger_name,
                                         const std::string &filename)
 {
     return Factory::template create<sinks::basic_file_sink_mt>(logger_name, filename);
 }
 
-template <typename Factory = minilog::synchronous_factory>
+template <typename Factory = synchronous_factory>
 std::shared_ptr<logger> basic_logger_st(const std::string &logger_name,
                                         const std::string &filename)
 {
