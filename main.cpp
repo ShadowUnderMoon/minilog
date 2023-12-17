@@ -47,7 +47,7 @@ void minilog_stdout_example() {
 void basic_logfile_example() {
     try
     {
-        auto logger = spdlog::basic_logger_mt("basic_logger", "spdlog.txt");
+        auto logger = spdlog::basic_logger_mt("basic_logger", "logs/spdlog.txt");
         logger->error("this is an error message");
     }
     catch (const spdlog::spdlog_ex& ex) {
@@ -56,7 +56,7 @@ void basic_logfile_example() {
 }
 
 void minilog_basic_logfile() {
-    auto logger = minilog::basic_logger_mt("basic_logger", "basic-log.txt");
+    auto logger = minilog::basic_logger_mt("basic_logger", "logs/minilog_basic-log.txt");
     logger->error("this is an error message");
     logger->info(30);
     logger->set_level(minilog::level::debug);
@@ -77,6 +77,28 @@ void multi_sink_example() {
     logger.set_level(spdlog::level::debug);
     logger.warn("this should appear in both console and file");
     logger.info("this message should not appear in the console, only in the file");
+}
+
+void minilog_multi_sink() {
+    auto console_sink = std::make_shared<minilog::sinks::stdout_color_sink_mt>();
+    console_sink->set_level(minilog::level::warning);
+
+    auto file_sink = std::make_shared<minilog::sinks::basic_file_sink_mt>("logs/minilog_multisink.txt");
+
+    minilog::logger logger("multi_sink", {std::move(console_sink), std::move(file_sink)});
+    logger.set_level(minilog::level::debug);
+    logger.warn("this should appear in both console and file");
+    logger.info("this message should not appear in the console, only in the file");    
+}
+
+void multi_sink_example2()
+{
+    spdlog::init_thread_pool(8192, 1);
+    auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt >();
+    auto rotating_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("mylog.txt");
+    std::vector<spdlog::sink_ptr> sinks {stdout_sink, rotating_sink};
+    auto logger = std::make_shared<spdlog::async_logger>("loggername", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+    spdlog::register_logger(logger);
 }
 
 // create a logger with a lambda function callback, the callback will be called
@@ -102,17 +124,6 @@ void async_example() {
     // auto sync_file = spdlog::create_async<spdlog::sinks::basic_file_sink_mt>("async_file_logger", "logs/async_log.txt");
 }
 
-
-void multi_sink_example2()
-{
-    spdlog::init_thread_pool(8192, 1);
-    auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt >();
-    auto rotating_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("mylog.txt");
-    std::vector<spdlog::sink_ptr> sinks {stdout_sink, rotating_sink};
-    auto logger = std::make_shared<spdlog::async_logger>("loggername", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-    spdlog::register_logger(logger);
-}
-
 void replace_default_logger_example() {
     auto new_logger = spdlog::basic_logger_mt("new_default_logger", "logs/new-default-log.txt", true);
     spdlog::set_default_logger(new_logger);
@@ -124,7 +135,7 @@ void minilog_replace_default_logger() {
     auto new_stdout_logger = minilog::stdout_color_mt("console");
     minilog::set_default_logger(std::move(new_stdout_logger));
     minilog::info("new stdout logger");
-    auto new_logger = minilog::basic_logger_mt("new_default_logger", "minilog_new-default-log.txt");
+    auto new_logger = minilog::basic_logger_mt("new_default_logger", "logs/minilog_new-default-log.txt");
     minilog::set_default_logger(std::move(new_logger));
     minilog::info("new logger log message");
 }
@@ -165,15 +176,18 @@ void minilog_registry_base() {
 }
 
 int main(int argc, char *argv[]) {
-    stdout_example();
-    minilog_stdout_example();
+    // stdout_example();
+    // minilog_stdout_example();
 
-    basic_logfile_example();
-    minilog_basic_logfile();
+    // basic_logfile_example();
+    // minilog_basic_logfile();
 
-    registry_base();
-    minilog_registry_base();
+    // registry_base();
+    // minilog_registry_base();
 
-    replace_default_logger_example();
-    minilog_replace_default_logger();
+    // replace_default_logger_example();
+    // minilog_replace_default_logger();
+
+    multi_sink_example();
+    minilog_multi_sink();
 }
