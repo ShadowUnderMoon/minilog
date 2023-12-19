@@ -10,6 +10,7 @@
 #include <minilog/sinks/stdout_color_sinks.h>
 #include <minilog/sinks/callback_sink.h>
 #include <minilog/cfg.h>
+#include <minilog/sinks/db_sink.h>
 #include <iostream>
 
 // multi/single threaded loggers
@@ -117,7 +118,7 @@ void callback_example()
     logger.error("critical issue");
 }
 
-void mninilog_callback_example()
+void minilog_callback_example()
 {
     auto callback_sink = std::make_shared<minilog::sinks::callback_sink_mt>([](const minilog::log_msg& msg) {
         std::cout << "email me error message: " << msg.payload << std::endl;
@@ -128,6 +129,18 @@ void mninilog_callback_example()
 
     logger.info("some info log");
     logger.error("critical issue");
+}
+
+void minilog_db_sink()
+{
+    auto callback_sink = std::make_shared<minilog::sinks::callback_sink_mt>(minilog::sinks::sink_to_db);
+    callback_sink->set_level(minilog::level::error);
+    auto console_sink = std::make_shared<minilog::sinks::stdout_color_sink_mt>();
+    minilog::logger logger("custom_callback_logger", {console_sink, callback_sink});
+
+    logger.info("some info log");
+    logger.error("critical 'issue");
+
 }
 
 void async_example() {
@@ -205,6 +218,8 @@ int main(int argc, char *argv[]) {
     // multi_sink_example();
     // minilog_multi_sink();
 
-    callback_example();
-    mninilog_callback_example();
+    // callback_example();
+    // minilog_callback_example();
+
+    minilog_db_sink();
 }
