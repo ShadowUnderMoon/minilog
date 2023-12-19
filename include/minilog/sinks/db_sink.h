@@ -29,14 +29,20 @@ inline void sink_to_db(const log_msg &msg) {
         mysqlpp::Connection conn = DBSink::getConnection();
         if (conn.connected()) {
             std::filesystem::path absolute_path = msg.location.file_name();
-            std::string sql_stat = std::format(
-                "INSERT INTO logs (log_time, level, message, filename, linenumber) VALUES ('{}', '{}', '{}', '{}', {});", 
-                msg.time, magic_enum::enum_name(msg.level), msg.payload, std::string(absolute_path.filename()), msg.location.line());
-            std::cout << std::string(10, '-') << std::endl;
-            std::cout << sql_stat << std::endl;
-            std::cout << std::string(10, '-') << std::endl;
-            mysqlpp::Query query = conn.query(sql_stat.c_str());
-            if (auto res = query.execute()) {
+            const char *sql_stat = "INSERT INTO logs (log_time, level, message, filename, linenumber) VALUES (%0q, %1q, %2q, %3q, %4q);";
+            
+            //     msg.time, magic_enum::enum_name(msg.level), msg.payload, std::string(absolute_path.filename()), msg.location.line());
+            // std::cout << std::string(10, '-') << std::endl;
+            // std::cout << sql_stat << std::endl;
+            // std::cout << std::string(10, '-') << std::endl;
+            mysqlpp::Query query = conn.query(sql_stat);
+            query.parse();
+            if (auto res = query.execute(
+                format("{}", msg.time).c_str(),
+                std::string(magic_enum::enum_name(msg.level)).c_str(),
+                std::string(msg.payload).c_str(),
+                std::string(absolute_path.filename()).c_str(),
+                std::format("{}",msg.location.line()).c_str())) {
                 std::cout << "inserted " << res.rows() << " rows into the table" << std::endl;
             }            
         }

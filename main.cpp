@@ -140,6 +140,8 @@ void minilog_db_sink()
 
     logger.info("some info log");
     logger.error("critical 'issue");
+    logger.error("use double quotes \" double quotes");
+    logger.error("use single quotes ' single quotes");
 
 }
 
