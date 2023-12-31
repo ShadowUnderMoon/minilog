@@ -93,16 +93,6 @@ void minilog_multi_sink() {
     logger.info("this message should not appear in the console, only in the file");    
 }
 
-void multi_sink_example2()
-{
-    spdlog::init_thread_pool(8192, 1);
-    auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt >();
-    auto rotating_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("mylog.txt");
-    std::vector<spdlog::sink_ptr> sinks {stdout_sink, rotating_sink};
-    auto logger = std::make_shared<spdlog::async_logger>("loggername", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-    spdlog::register_logger(logger);
-}
-
 // create a logger with a lambda function callback, the callback will be called
 // each time something is logged to the logger
 void callback_example()
@@ -151,6 +141,19 @@ void async_example() {
     auto async_file = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", "logs/async_log.txt");
     // alternatively:
     // auto sync_file = spdlog::create_async<spdlog::sinks::basic_file_sink_mt>("async_file_logger", "logs/async_log.txt");
+    for (int i = 0; i < 101; ++i) {
+        async_file->info("Async message #{}", i);
+    }
+}
+
+void multi_sink_example2()
+{
+    spdlog::init_thread_pool(8192, 1);
+    auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt >();
+    auto rotating_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("mylog.txt");
+    std::vector<spdlog::sink_ptr> sinks {stdout_sink, rotating_sink};
+    auto logger = std::make_shared<spdlog::async_logger>("loggername", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+    spdlog::register_logger(logger);
 }
 
 void replace_default_logger_example() {
@@ -223,5 +226,7 @@ int main(int argc, char *argv[]) {
     // callback_example();
     // minilog_callback_example();
 
-    minilog_db_sink();
+    // minilog_db_sink();
+
+    async_example();
 }

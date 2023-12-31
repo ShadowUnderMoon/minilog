@@ -186,7 +186,7 @@ public:
         }
     }
 
-    void sink_it_(const log_msg &msg) {
+    virtual void sink_it_(const log_msg &msg) {
         for (auto &sink : sinks_) {
             if (sink->should_log(msg.level)) {
                 sink->log(msg);

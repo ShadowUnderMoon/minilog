@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_CXX_EXTENSIONS OFF)
 
-project(main LANGUAGES CXX)
+project(minilog LANGUAGES CXX)
 
 # find_package(spdlog REQUIRED)
 set(SPDLOG_USE_STD_FORMAT ON CACHE BOOL "use std::format" FORCE)
@@ -19,7 +19,7 @@ find_package(magic_enum REQUIRED)
 
 # add_compile_definitions(SPDLOG_USE_STD_FORMAT)
 add_executable(main main.cpp)
-target_include_directories(main PRIVATE include)
+target_include_directories(main PUBLIC include)
 target_link_libraries(main PRIVATE magic_enum::magic_enum)
 # target_link_libraries(main PRIVATE spdlog::spdlog)
 target_link_libraries(main PRIVATE spdlog::spdlog)
