@@ -25,6 +25,10 @@ inline void set_level(level::level_enum lvl) {
     get_default_logger()->set_level(lvl);
 }
 
+inline void register_logger(std::shared_ptr<logger> logger) {
+    registry::get_instance().register_logger(std::move(logger));
+}
+
 template <typename T>
 void trace(const T &msg, std::source_location loc=std::source_location::current()) {
     get_default_logger()->trace(msg, loc);

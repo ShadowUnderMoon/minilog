@@ -1,3 +1,6 @@
+#include "minilog/sinks/ansicolor_sink.h"
+#include "minilog/sinks/sink.h"
+#include "minilog/thread_pool.h"
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -157,12 +160,32 @@ void minilog_async_example() {
 
 void multi_sink_example2()
 {
-    spdlog::init_thread_pool(8192, 1);
+    spdlog::init_thread_pool(8192, 3);
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt >();
-    auto rotating_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("mylog.txt");
-    std::vector<spdlog::sink_ptr> sinks {stdout_sink, rotating_sink};
-    auto logger = std::make_shared<spdlog::async_logger>("loggername", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/spd_async2.txt");
+    std::vector<spdlog::sink_ptr> sinks {stdout_sink, file_sink};
+    auto logger = std::make_shared<spdlog::async_logger>("spdlog_async2", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
     spdlog::register_logger(logger);
+
+    for (int i = 0; i < 101; ++i) {
+        logger->info("Async message #{}", i);
+    }    
+    logger->error("an error message");
+}
+
+void minilog_multi_sink_example2()
+{
+    minilog::init_thread_pool(8192, 3);
+    auto stdout_sink = std::make_shared<minilog::sinks::stdout_color_sink_mt>();
+    auto file_sink = std::make_shared<minilog::sinks::basic_file_sink_mt>("logs/minilog_async2.txt");
+    std::vector<std::shared_ptr<minilog::sinks::sink>> sinks {stdout_sink, file_sink};
+    auto logger = std::make_shared<minilog::async_logger>("minilog_async2", sinks.begin(), sinks.end(), minilog::thread_pool(), minilog::async_overflow_policy::block);
+    minilog::register_logger(logger);
+
+    for (int i = 0; i < 101; ++i) {
+        logger->info("Async message #{}", i);
+    }    
+    logger->error("an error message");
 }
 
 void replace_default_logger_example() {
@@ -237,6 +260,9 @@ int main(int argc, char *argv[]) {
 
     // minilog_db_sink();
 
-    async_example();
-    minilog_async_example();
+    // async_example();
+    // minilog_async_example();
+
+    multi_sink_example2();
+    minilog_multi_sink_example2();
 }

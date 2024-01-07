@@ -113,7 +113,7 @@ inline void init_thread_pool(size_t q_size, size_t thread_count) {
     init_thread_pool(q_size, thread_count, [] {}, [] {});
 }
 
-inline std::shared_ptr<thread_pool> thread_poool() {
+inline std::shared_ptr<thread_pool> thread_pool() {
     return registry::get_instance().get_tp();
 }
 }
