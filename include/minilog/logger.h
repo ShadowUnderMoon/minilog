@@ -89,7 +89,7 @@ public:
         return static_cast<level::level_enum>(flush_level_.load(std::memory_order_relaxed));
     }
 
-    bool should_flush(const log_msg &msg) {
+    bool should_flush_(const log_msg &msg) {
         auto flush_level = flush_level_.load(std::memory_order_relaxed);
         return (msg.level >= flush_level) && (msg.level != level::off);
     }

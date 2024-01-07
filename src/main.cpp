@@ -11,6 +11,7 @@
 #include <minilog/sinks/callback_sink.h>
 #include <minilog/cfg.h>
 #include <minilog/sinks/db_sink.h>
+#include <minilog/async_logger.h>
 #include <iostream>
 
 // multi/single threaded loggers
@@ -146,6 +147,14 @@ void async_example() {
     }
 }
 
+void minilog_async_example() {
+    auto async_file = minilog::basic_logger_mt<minilog::async_factory>("minilog_async_file_logger", "logs/minilog_async_log.txt");
+
+    for (int i = 0; i < 101; ++i) {
+        async_file->info("async message #{}", i);
+    }
+}
+
 void multi_sink_example2()
 {
     spdlog::init_thread_pool(8192, 1);
@@ -229,4 +238,5 @@ int main(int argc, char *argv[]) {
     // minilog_db_sink();
 
     async_example();
+    minilog_async_example();
 }

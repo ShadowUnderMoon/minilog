@@ -1,12 +1,20 @@
 #pragma once
 
-#include <minilog/async_logger.h>
+#include "minilog/log_msg.h"
+#include <cassert>
 #include <minilog/mpmc_blocking_q.h>
 #include <cstddef>
 #include <functional>
 #include <stdexcept>
 #include <thread>
 namespace minilog {
+
+class async_logger;
+enum class async_overflow_policy {
+    block,
+    overrun_oldest,
+    discard_new
+};
 
 class log_msg_buffer : public log_msg {
     std::string buffer;
@@ -170,22 +178,6 @@ private:
         }
     }
 
-    bool process_next_msg_() {
-        async_msg incoming_async_msg;
-        q_.dequeue(incoming_async_msg);
-
-        if (incoming_async_msg.msg_type == async_msg_type::log) {
-            incoming_async_msg.worker_ptr->backend_sink_it_(incoming_async_msg);
-            return true;
-        } else if (incoming_async_msg.msg_type == async_msg_type::flush) {
-            incoming_async_msg.worker_ptr->backend_flush_();
-            return true;
-        } else if (incoming_async_msg.msg_type == async_msg_type::terminate) {
-            return false;
-        } else {
-            assert(false);
-        }
-        return true;
-    }
+    bool process_next_msg_();
 };
 }

@@ -2,18 +2,13 @@
 
 #include <minilog/logger.h>
 #include <minilog/registry.h>
+#include <minilog/thread_pool.h>
 
 namespace minilog {
 
-class thread_pool;
-
 static const size_t default_async_q_size = 8192;
 
-enum class async_overflow_policy {
-    block,
-    overrun_oldest,
-    discard_new
-};
+
 
 class async_logger final : public std::enable_shared_from_this<async_logger>,
                            public logger {
@@ -39,11 +34,32 @@ public:
                  async_overflow_policy overflow_policy = async_overflow_policy::block)
         : async_logger(std::move(logger_name), {std::move(single_sink)}, std::move(tp), overflow_policy) {}           
     // std::shared_ptr<logger> clone(std::string new_name) override;
+    ~async_logger() = default;
 protected:
-    void sink_it_(const log_msg& msg) override;
+    void sink_it_(const log_msg& msg) override {
+        if (auto pool_ptr = thread_pool_.lock()) {
+            pool_ptr->post_log(shared_from_this(), msg, overflow_policy_);
+        } else {
+            throw std::runtime_error("async log: thread pool doesn't exist anymore");
+        }
+
+        if (should_flush_(msg)) {
+            backend_flush_();
+        }
+    }
     // void flush_() override;
-    void backend_sink_it_(const log_msg& incoming_log_msg);
-    void backend_flush_();
+    void backend_sink_it_(const log_msg& incoming_log_msg) {
+        for (auto& sink : sinks_) {
+            if (sink->should_log(incoming_log_msg.level)) {
+                sink->log(incoming_log_msg);
+            }
+        }
+    }
+    void backend_flush_() {
+        for (auto& sink : sinks_) {
+            sink->flush();
+        }
+    }
 
 private:
     std::weak_ptr<thread_pool> thread_pool_;
