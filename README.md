@@ -1,5 +1,17 @@
 # minilog
 
+Mimic `spdlog` with the following highlights:
+
+- Colored terminal log
+- Basic file log
+- Use chrono
+- Use source_location instead of macros.
+- Enable logging to MySQL/MariaDB database
+- Global registry
+- Async logger, supported by thread pool and queue with mutex and conditional variable
+
+## database table schema
+
 ```sql
 CREATE TABLE logs (
     id INT AUTO_INCREMENT,
